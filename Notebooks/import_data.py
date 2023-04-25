@@ -4,6 +4,7 @@ import pandas as pd
 def import_data():
     # on commence par lire la table
     df_global = pd.read_csv("../data/complete_merged_dataset.csv", sep=";")
+    df_global.drop(df_global[df_global["id_client"] == 16].index, inplace=True)
 
     # sur chaque date la fin n'est pas indispensable car l'heure est toujours la même, on peut donc enlever cette partie pour simplifier.
     parser = lambda x: x[:-21]
