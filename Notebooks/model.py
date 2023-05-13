@@ -29,4 +29,4 @@ def creation_model(df, xarg, yarg):
         y = comp.groupby("id_client").get_group(i + 1)["pred"]
         y2 = comp.groupby("id_client").get_group(i + 1)["real_consumption"]
         evaluation_model.append(metrics(y2, y))
-    return evaluation_model
+    return model, evaluation_model
