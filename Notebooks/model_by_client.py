@@ -7,12 +7,12 @@ from group_by_clients import group_by_clients
 from make_train_test_set import make_train_test_set
 
 
-def creation_model_by_client(df, xargs, yargs, random_forest=False):
+def creation_model_by_client(df, xargs, yargs, lim_date, random_forest=False):
     clients = group_by_clients(df)
     n = len(clients)
 
     X_train, X_test, y_train, y_test, test_data = make_train_test_set(
-        clients, xargs, yargs
+        clients, xargs, yargs, lim_date
     )
 
     if random_forest:
@@ -31,4 +31,4 @@ def creation_model_by_client(df, xargs, yargs, random_forest=False):
     for i in range(n):
         evaluation_model.append(metrics(y_test[i], y_pred[i]))
 
-    return model, evaluation_model
+    return models, evaluation_model

@@ -2,9 +2,9 @@ from typing import List, Tuple
 
 
 def make_train_test_set(
-    clients: List, x_vars: List[str], y_vars: List[str]
+    clients: List, x_vars: List[str], y_vars: List[str], lim_date: float
 ) -> Tuple[List, List, List, List]:
-    train_size = int(len(clients[0]) * 0.8)
+    train_size = int(len(clients[0]) * lim_date)
     train_data = [client[:train_size] for client in clients]
     test_data = [client[train_size:] for client in clients]
 
