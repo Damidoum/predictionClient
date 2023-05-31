@@ -3,6 +3,13 @@ from metrics import export_mesure
 
 
 def display_mesure(data, eval_model_list, titles):
+    """
+    description : permet de faire l'affichage de la moyenne des R2, MSE, MAE pour chaque client.
+    paramètres : 
+    - data : DataFrame des données 
+    - eval_model_list 
+    """
+
     X = data["id_client"].unique()
 
     fig, ax = plt.subplots(3, figsize=(10, 10))

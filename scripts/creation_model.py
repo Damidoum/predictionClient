@@ -12,6 +12,14 @@ from metrics import metrics
 def make_train_test_set(
     clients: List, x_vars: List[str], y_vars: List[str], lim_date: float
 ) -> Tuple[List, List, List, List]:
+    """
+    description : réalise les ensembles de test / train pour appliquer le modèle de ML
+    paramètres :
+    - clients : liste contenant un DataFrame par client
+    - x_vars : variables à prendre en compte pour l'entrainement
+    - y_vars : variables à prédire
+    - lim_date : pourcentage des données qu'on veut garder pour l'entrainement
+    """
     train_size = int(len(clients[0]) * lim_date)
     train_data = [client[:train_size] for client in clients]
     test_data = [client[train_size:] for client in clients]
@@ -26,7 +34,24 @@ def make_train_test_set(
     return X_train, X_test, y_train, y_test, test_data
 
 
-def creation_model(df, xargs, yargs, lim_date, random_forest=False, n_estimators=150):
+def creation_model(
+    df: pd.DataFrame,
+    xargs: List[str],
+    yargs: List[str],
+    lim_date: float,
+    random_forest=False,
+    n_estimators=150,
+):
+    """
+    description : crée le modèle à partir des données complètes (en ne groupant pas le DataFrame par client)
+    paramètres :
+    - df : DataFrame des données complètes
+    - x_args : variables à prendre en compte pour l'entrainement
+    - y_args : variables à prédire
+    -lim_date : pourcentage des données qu'on veut garder pour l'entrainement
+    - random_forest : True si on veut utiliser un randomForestRegressor plutôt qu'une LinearRegression
+    - n_estimators : paramètre du random forest
+    """
     n = df["id_client"].max()
     train_size = int(len(df.groupby("id_client").get_group(1)) * lim_date)
     date_lim = df.groupby("id_client").get_group(1)["horodate"][:train_size].iloc[-1]
@@ -53,14 +78,30 @@ def creation_model(df, xargs, yargs, lim_date, random_forest=False, n_estimators
     evaluation_model = []
     for i in df["id_client"].unique():
         y = comp.groupby("id_client").get_group(i)["pred"]
-        y2 = comp.groupby("id_client").get_group(i)["real_consumption"]
+        y2 = comp.groupby("id_client").get_group(i)[yargs]
         evaluation_model.append(metrics(y2, y))
     return model, evaluation_model
 
 
 def creation_model_by_client(
-    df, xargs, yargs, lim_date, random_forest=False, n_estimators=150
+    df: pd.DataFrame,
+    xargs: List[str],
+    yargs: List[str],
+    lim_date: float,
+    random_forest=False,
+    n_estimators=150,
 ):
+    """
+    description : crée le modèle à partir des données complètes (en groupant le DataFrame par client)
+    paramètres :
+    - df : DataFrame des données complètes
+    - x_args : variables à prendre en compte pour l'entrainement
+    - y_args : variables à prédire
+    -lim_date : pourcentage des données qu'on veut garder pour l'entrainement
+    - random_forest : True si on veut utiliser un randomForestRegressor plutôt qu'une LinearRegression
+    - n_estimators : paramètre du random forest
+    """
+
     clients = group_by_clients(df)
     n = len(clients)
 
@@ -88,8 +129,26 @@ def creation_model_by_client(
 
 
 def complet_process(
-    df, xargs, yargs, lim_date, group=False, random_forest=False, n_estimators=150
+    df: pd.DataFrame,
+    xargs: List[str],
+    yargs: List[str],
+    lim_date: float,
+    group=False,
+    random_forest=False,
+    n_estimators=150,
 ):
+    """
+    description : processus complet de création du modèle, on choisit si on veut grouper
+    le DataFrame par client ou pas
+    paramètres :
+    - pd : DataFrame des données complètes
+    - x_vars : variables à prendre en compte pour l'entrainement
+    - y_vars : variables à prédire
+    - lim_date : pourcentage des données qu'on veut garder pour l'entrainement
+    - group : True si on veut grouper le DataFrame par client
+    - random_forest : True si on veut utiliser un randomForestRegressor plutôt qu'une LinearRegression
+    - n_estimators : paramètre du random forest
+    """
     if group:
         model, eval_model = creation_model_by_client(
             df, xargs, yargs, lim_date, random_forest, n_estimators
