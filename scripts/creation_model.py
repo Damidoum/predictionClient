@@ -84,7 +84,7 @@ def creation_model(
     evaluation_model = []
     for i in df["id_client"].unique():
         y = comp.groupby("id_client").get_group(i)["pred"]
-        y2 = comp.groupby("id_client").get_group(i)[yargs]
+        y2 = np.array(comp.groupby("id_client").get_group(i)[yargs]).ravel()
         evaluation_model.append(metrics(y2, y))
     return model, evaluation_model
 
@@ -129,7 +129,7 @@ def creation_model_by_client(
 
     evaluation_model = []
     for i in range(n):
-        evaluation_model.append(metrics(y_test[i], y_pred[i]))
+        evaluation_model.append(metrics(np.array(y_test[i]).ravel(), np.array(y_pred[i]).ravel()))
 
     return models, evaluation_model
 

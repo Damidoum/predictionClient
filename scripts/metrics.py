@@ -2,14 +2,16 @@ from sklearn.metrics import r2_score, mean_squared_error, mean_absolute_error
 from sklearn.inspection import permutation_importance
 import pandas as pd
 from typing import List, Tuple
-
-# librairies perso :
-from creation_model import make_train_test_set, complet_process
+import numpy as np
 
 
 def metrics(y_true, y_pred):
     # Calculer le coefficient de détermination (R²)
-    r2 = r2_score(y_true, y_pred)
+    # r2 = r2_score(y_true, y_pred)
+
+    correlation_matrix = np.corrcoef(y_true, y_pred)
+    correlation = correlation_matrix[0, 1]
+    r2 = correlation**2
 
     # Calculer l'erreur quadratique moyenne (EQM)
     mse = mean_squared_error(y_true, y_pred)
@@ -33,6 +35,9 @@ def tab_mesure(eval_model):
     return df
 
 
+from creation_model import complet_process
+
+
 def permutation_feature_importance(
     df: pd.DataFrame,
     xargs: List[str],
@@ -49,6 +54,7 @@ def permutation_feature_importance(
     train_size = int(
         len(df.groupby("id_client").get_group(df["id_client"].unique()[0])) * lim_date
     )
+
     date_lim = (
         df.groupby("id_client")
         .get_group(df["id_client"].unique()[0])["horodate"][:train_size]
@@ -56,8 +62,6 @@ def permutation_feature_importance(
     )
     train = df[df["horodate"] <= date_lim]
     test = df[df["horodate"] > date_lim]
-    X_train = train.copy()[xargs]
-    Y_train = train.copy()[yargs]
     X_test = test.copy()[xargs]
     Y_test = test.copy()[yargs]
 
