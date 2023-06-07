@@ -6,7 +6,7 @@ from sklearn.linear_model import LinearRegression
 
 # librairies perso
 from group_by_clients import group_by_clients
-from metrics import metrics
+from metrics import metrics, tab_mesure
 
 
 def make_train_test_set(
@@ -53,8 +53,14 @@ def creation_model(
     - n_estimators : paramètre du random forest
     """
     n = df["id_client"].max()
-    train_size = int(len(df.groupby("id_client").get_group(1)) * lim_date)
-    date_lim = df.groupby("id_client").get_group(1)["horodate"][:train_size].iloc[-1]
+    train_size = int(
+        len(df.groupby("id_client").get_group(df["id_client"].unique()[0])) * lim_date
+    )
+    date_lim = (
+        df.groupby("id_client")
+        .get_group(df["id_client"].unique()[0])["horodate"][:train_size]
+        .iloc[-1]
+    )
     train = df[df["horodate"] <= date_lim]
     test = df[df["horodate"] > date_lim]
     X_train = train.copy()[xargs]
@@ -158,3 +164,27 @@ def complet_process(
             df, xargs, yargs, lim_date, random_forest, n_estimators
         )
     return model, eval_model
+
+
+def best_lim_date(
+    df: pd.DataFrame,
+    xargs: List[str],
+    yargs: List[str],
+    group=False,
+    random_forest=False,
+    n_estimators=150,
+):
+
+    best_mse = [0,np.inf]
+    best_mae = [0, np.inf]
+    best_moy = [0, np.inf]
+    for i in range(1,90): 
+        model, eval_model = complet_process(df, xargs, yargs,i/100, group, random_forest, n_estimators)
+        if tab_mesure(eval_model).describe().loc["mean", "MSE"] < best_mse[1] : 
+            best_mse[0], best_mse[1] = i/100, tab_mesure(eval_model).describe().loc["mean", "MSE"]
+        if tab_mesure(eval_model).describe().loc["mean", "MAE"] < best_mae[1] : 
+            best_mae[0], best_mae[1] = i/100, tab_mesure(eval_model).describe().loc["mean", "MAE"]
+        if (tab_mesure(eval_model).describe().loc["mean", "MAE"] + tab_mesure(eval_model).describe().loc["mean", "MSE"])/2 < best_moy[1] : 
+            best_moy[0], best_moy[1] = i/100, (tab_mesure(eval_model).describe().loc["mean", "MAE"] + tab_mesure(eval_model).describe().loc["mean", "MSE"])/2
+    return best_mse[0], best_mae[0], best_moy[0]
+        

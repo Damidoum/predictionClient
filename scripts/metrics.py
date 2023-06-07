@@ -1,5 +1,10 @@
 from sklearn.metrics import r2_score, mean_squared_error, mean_absolute_error
+from sklearn.inspection import permutation_importance
 import pandas as pd
+from typing import List, Tuple
+
+# librairies perso :
+from creation_model import make_train_test_set, complet_process
 
 
 def metrics(y_true, y_pred):
@@ -26,3 +31,41 @@ def tab_mesure(eval_model):
     r2, mse, mae = export_mesure(eval_model)
     df = pd.DataFrame({"R2": r2, "MSE": mse, "MAE": mae})
     return df
+
+
+def permutation_feature_importance(
+    df: pd.DataFrame,
+    xargs: List[str],
+    yargs: List[str],
+    lim_date: float,
+    random_forest=False,
+    n_estimators=150,
+):
+    """description : calcul des features importances"""
+    model, eval_model = complet_process(
+        df, xargs, yargs, lim_date, False, random_forest, n_estimators
+    )
+
+    train_size = int(
+        len(df.groupby("id_client").get_group(df["id_client"].unique()[0])) * lim_date
+    )
+    date_lim = (
+        df.groupby("id_client")
+        .get_group(df["id_client"].unique()[0])["horodate"][:train_size]
+        .iloc[-1]
+    )
+    train = df[df["horodate"] <= date_lim]
+    test = df[df["horodate"] > date_lim]
+    X_train = train.copy()[xargs]
+    Y_train = train.copy()[yargs]
+    X_test = test.copy()[xargs]
+    Y_test = test.copy()[yargs]
+
+    result = permutation_importance(
+        model, X_test, Y_test, n_repeats=100, random_state=42
+    )
+
+    # Récupération des scores d'importance
+    importance_scores = result.importances_mean
+
+    return importance_scores
