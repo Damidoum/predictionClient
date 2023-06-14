@@ -50,42 +50,26 @@ class Model:
                 self.model = [LinearRegression() for _ in self.df["id_client"].unique()]
 
     def best_lim_date(self):
-        best_mse = [0, np.inf]
-        best_mae = [0, np.inf]
         best_moy = [0, np.inf]
-        for i in range(1, 90):
-            model, eval_model = complet_process(
-                self.df,
-                self.xargs,
-                self.yargs,
-                i / 100,
-                self.group,
-                self.random_forest,
-                n_estimators=150,
-            )
-            if tab_mesure(eval_model).describe().loc["mean", "MSE"] < best_mse[1]:
-                best_mse[0], best_mse[1] = (
-                    i / 100,
-                    tab_mesure(eval_model).describe().loc["mean", "MSE"],
-                )
-            if tab_mesure(eval_model).describe().loc["mean", "MAE"] < best_mae[1]:
-                best_mae[0], best_mae[1] = (
-                    i / 100,
-                    tab_mesure(eval_model).describe().loc["mean", "MAE"],
-                )
+        for i in range(60, 85):
+            self.lim_date = i / 100
+            self.complet_process(False)
+
             if (
-                tab_mesure(eval_model).describe().loc["mean", "MAE"]
-                + tab_mesure(eval_model).describe().loc["mean", "MSE"]
+                tab_mesure(self.evaluation_model).describe().loc["mean", "MAE"]
+                + tab_mesure(self.evaluation_model).describe().loc["mean", "MSE"]
             ) / 2 < best_moy[1]:
                 best_moy[0], best_moy[1] = (
                     i / 100,
                     (
-                        tab_mesure(eval_model).describe().loc["mean", "MAE"]
-                        + tab_mesure(eval_model).describe().loc["mean", "MSE"]
+                        tab_mesure(self.evaluation_model).describe().loc["mean", "MAE"]
+                        + tab_mesure(self.evaluation_model)
+                        .describe()
+                        .loc["mean", "MSE"]
                     )
                     / 2,
                 )
-        return best_mse[0], best_mae[0], best_moy[0]
+        return best_moy[0]
 
     def generate_train_set(self):
         train_size = int(
@@ -158,9 +142,10 @@ class Model:
                     )
                 )
 
-    def complet_process(self):
-        x1, x2, x3 = self.best_lim_date()
-        self.lim_date = x3
+    def complet_process(self, change_date=True):
+        if change_date:
+            self.lim_date = self.best_lim_date()
+
         self.generate_model()
         self.generate_train_set()
         self.train_model()
