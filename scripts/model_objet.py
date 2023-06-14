@@ -3,6 +3,8 @@ import pandas as pd
 import numpy as np
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.linear_model import LinearRegression
+from sklearn.ensemble import GradientBoostingRegressor
+
 
 # librairies perso
 from metrics import metrics, tab_mesure
@@ -17,31 +19,35 @@ class Model:
         yargs,
         lim_date,
         group=False,
-        random_forest=False,
+        type_regressor="Linear",
     ) -> None:
         self.df = df
         self.xargs = xargs
         self.yargs = yargs
         self.group = group
         self.lim_date = lim_date
-        self.random_forest = random_forest
+        self.type_regressor = type_regressor
 
     def generate_model(self):
         if not self.group:
-            if not self.random_forest:
-                self.model = LinearRegression()
-            else:
+            if self.type_regressor == "random_forest":
                 self.model = RandomForestRegressor()
+            elif self.type_regressor == "gradient_boosting":
+                self.model = GradientBoostingRegressor()
+            else:
+                self.model = LinearRegression()
+
         else:
-            if not self.random_forest:
+            if self.type_regressor == "random_forest":
                 self.model = [
-                    LinearRegression() for _ in range(self.df["id_client"].unique())
+                    RandomForestRegressor() for _ in self.df["id_client"].unique()
+                ]
+            elif self.type_regressor == "gradient_boosting":
+                self.model = [
+                    GradientBoostingRegressor() for _ in self.df["id_client"].unique()
                 ]
             else:
-                self.model = [
-                    RandomForestRegressor()
-                    for _ in range(self.df["id_client"].unique())
-                ]
+                self.model = [LinearRegression() for _ in self.df["id_client"].unique()]
 
     def best_lim_date(self):
         best_mse = [0, np.inf]
@@ -82,22 +88,20 @@ class Model:
         return best_mse[0], best_mae[0], best_moy[0]
 
     def generate_train_set(self):
+        train_size = int(
+            len(
+                self.df.groupby("id_client").get_group(self.df["id_client"].unique()[0])
+            )
+            * self.lim_date
+        )
+        self.date_lim = (
+            self.df.groupby("id_client")
+            .get_group(self.df["id_client"].unique()[0])["horodate"][:train_size]
+            .iloc[-1]
+        )
         if not self.group:
-            train_size = int(
-                len(
-                    self.df.groupby("id_client").get_group(
-                        self.df["id_client"].unique()[0]
-                    )
-                )
-                * self.lim_date
-            )
-            date_lim = (
-                self.df.groupby("id_client")
-                .get_group(self.df["id_client"].unique()[0])["horodate"][:train_size]
-                .iloc[-1]
-            )
-            train = self.df[self.df["horodate"] <= date_lim]
-            test = self.df[self.df["horodate"] > date_lim]
+            train = self.df[self.df["horodate"] <= self.date_lim]
+            test = self.df[self.df["horodate"] > self.date_lim]
             self.x_train = train.copy()[self.xargs]
             self.y_train = train.copy()[self.yargs]
             self.x_test = test.copy()[self.xargs]
@@ -112,10 +116,10 @@ class Model:
             test_data = [client[train_size:] for client in self.clients]
 
             # on garde ensuite que les x_vars et y_vars choisis
-            self.x_train = [train_client[self.x_vars] for train_client in train_data]
-            self.y_train = [train_client[self.y_vars] for train_client in train_data]
-            self.x_test = [test_client[self.x_vars] for test_client in test_data]
-            self.y_test = [test_client[self.y_vars] for test_client in test_data]
+            self.x_train = [train_client[self.xargs] for train_client in train_data]
+            self.y_train = [train_client[self.yargs] for train_client in train_data]
+            self.x_test = [test_client[self.xargs] for test_client in test_data]
+            self.y_test = [test_client[self.yargs] for test_client in test_data]
 
     def train_model(self):
         if not self.group:
@@ -128,9 +132,9 @@ class Model:
         if not self.group:
             self.y_pred = self.model.predict(self.x_test)
         else:
+            self.y_pred = []
             for i, model in enumerate(self.model):
-                self.y_pred = []
-                self.y_pred.append(model.predict(self.y_test[i]))
+                self.y_pred.append(model.predict(self.x_test[i]).ravel())
 
     def performance_indicator(self):
         self.evaluation_model = []
