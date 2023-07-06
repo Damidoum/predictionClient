@@ -32,8 +32,8 @@ for i in clients[1:] :
     cell.source = re.sub(pattern2, f"client = {i}", cell.source)
 
 
-    # Enregistrer le nouveau notebook avec un nom unique
-    new_notebook_path = f"client{i}.ipynb"
+    # Enregistrer le nouveau notebook
+    new_notebook_path = f"client_{i}.ipynb"
 
     # Créer un exécuteur pour exécuter le notebook
     executeur = ExecutePreprocessor(timeout=None)
@@ -45,24 +45,6 @@ for i in clients[1:] :
     with open(new_notebook_path, "w", encoding="utf-8") as f:
         nbf.write(new_notebook, f)
     print(f"Notebook {i} créé avec succès.")
-
-
-
-"""
-    # Modifier la valeur de `data` dans le notebook copié
-    for cell in new_notebook.cells:
-        if cell.cell_type == "code":
-            cell.source = re.sub(
-                pattern, f"data = pd.read_csv('{dataframe_file}'    )", cell.source
-            )
-
-
-"""
-
-
-
-
-
 
 
 

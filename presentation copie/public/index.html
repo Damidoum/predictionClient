@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Résultats des clients</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="data.js"></script>
+    <script src="main.js"></script>
+    <script src="feature.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.4"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@1.1.1"></script>
+    <script src="https://cdn.jsdelivr.net/npm/papaparse@5.3.0"></script>
+
+</head>
+
+<body>
+    <h1>Résultats des clients</h1>
+
+    <label for="client-select">Sélectionnez un client :</label>
+    <select id="client-select" onchange="changeClient()">
+        <option value="">Sélectionnez un client</option>
+        <option value="global-results">Résultats</option>
+        <script>
+            var clientSelect = document.getElementById('client-select');
+            var clients = [1, 2, 3, 4, 5, 6, 7, 10, 11, 12, 13, 14, 15, 16, 18, 19, 20,
+                21, 22, 24, 25, 26, 27, 29, 30, 31, 32, 33, 34, 35, 36, 39, 40, 41,
+                42, 43, 44, 45, 46, 47, 48];
+            for (var i = 0; i < clients.length; i++) {
+                var option = document.createElement('option');
+                option.value = `client${clients[i]}`;
+                option.text = `client ${clients[i]}`;
+                clientSelect.appendChild(option);
+            }
+        </script>
+    </select>
+    <div id="client-content"></div>
+</body>
+
+</html>
