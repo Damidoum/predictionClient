@@ -141,7 +141,7 @@ function generateClientTemplate() {
 
     <div class=chart>
         <div class="presentation">
-            <h1>Sixième modèle : Random Forest en prenant en compte le biais </h1>
+            <h1>Sixième modèle : Random Forest en prenant en ajoutant un bruit aux variables </h1>
             <p>Ajout d'un bruit gaussien pour perturber les données boursières. Cela permet de faire comme si ces
                 données étaient prédites deux semaines à l'avance
             </p>
@@ -156,9 +156,25 @@ function generateClientTemplate() {
         </div>
         <div id=error6></div>
     </div>
+    <div class=chart>
+        <div class="presentation">
+            <h1>Septième modèle : Random Forest en décalant les variables </h1>
+            <p>Décalage des données boursières.
+            </p>
+        </div>
+        <div class="chart-container">
+            <div class="chart-title"></div>
+            <canvas id="chart7"></canvas>
+        </div>
+        <div class="chart-container">
+            <div class="chart-title"></div>
+            <canvas id="scatter7"></canvas>
+        </div>
+        <div id=error7></div>
+    </div>
 
     <div class=results>
-        <h1> Synthèses des différents modèles </h1>
+        <h1> Synthèse des différents modèles </h1>
         <div class="results-container">
             <canvas id="chart-results-mse"></canvas>
         </div>
@@ -172,7 +188,7 @@ function generateClientTemplate() {
             <canvas id="chart-results"></canvas>
         </div>
     </div>
-</div>    `;
+</div>`;
 }
 
 
@@ -187,7 +203,7 @@ function generateResultTemplate() {
     </div>
     
     <div class="MAE">
-        <h2>Comparaison des MSE</h2>
+        <h2>Comparaison des MAE</h2>
         <div class="chart-container">
             <canvas id="global-mae"></canvas>
         </div>

@@ -7,7 +7,9 @@ let titles = ["Consommation client et prédiction client",
     "Modèle 3 : Random Forest",
     "Modèle 4 : Gradient Boosting",
     "Modèle 5 : SVM",
-    "Modèle 6 : Random Forest avec les données bruités"];
+    "Modèle 6 : Random Forest avec les données bruités",
+    "Modèle 7 : Random Forest avcec les données déaclées"
+];
 
 function loadImages(client) {
     let client_modif = client.slice(0, 6) + "_" + client.slice(6,)
@@ -28,7 +30,7 @@ function displayData(client) {
         image.src = images[i];
     }
 
-    for (let i = 0; i < 7; i++) {
+    for (let i = 0; i < 8; i++) {
 
         if (i == 0) {
             var axis = ["Consommation réelle", "Consommation prédite par le client"];
@@ -93,6 +95,7 @@ function global_results_display(loss) {
             const modele4 = data.map(entry => entry.modele4);
             const modele5 = data.map(entry => entry.modele5);
             const modele6 = data.map(entry => entry.modele6);
+            const modele7 = data.map(entry => entry.modele7);
 
             const ctx = document.getElementById(`global-${loss}`).getContext('2d');
             new Chart(ctx, {
@@ -146,6 +149,13 @@ function global_results_display(loss) {
                             label: "Modèle 6",
                             data: modele6,
                             borderColor: 'gray',
+                            backgroundColor: 'transparent',
+                            fill: false
+                        },
+                        {
+                            label: "Modèle 7",
+                            data: modele7,
+                            borderColor: 'black',
                             backgroundColor: 'transparent',
                             fill: false
                         }
@@ -203,7 +213,7 @@ function results_display(client) {
             new Chart(ctx1, {
                 type: 'bar',
                 data: {
-                    labels: ['Données brutes', 'Modèle 1', 'Modèle 2', 'Modèle 3', 'Modèle 4', 'Modèle 5', 'Modèle 6'],
+                    labels: ['Données brutes', 'Modèle 1', 'Modèle 2', 'Modèle 3', 'Modèle 4', 'Modèle 5', 'Modèle 6', 'Modèle 7'],
                     datasets: [
                         {
                             label: 'MSE',
@@ -230,7 +240,7 @@ function results_display(client) {
             new Chart(ctx2, {
                 type: 'bar',
                 data: {
-                    labels: ['Données brutes', 'Modèle 1', 'Modèle 2', 'Modèle 3', 'Modèle 4', 'Modèle 5', 'Modèle 6'],
+                    labels: ['Données brutes', 'Modèle 1', 'Modèle 2', 'Modèle 3', 'Modèle 4', 'Modèle 5', 'Modèle 6', 'Modèle 7'],
                     datasets: [
                         {
                             label: 'MAE',
@@ -257,7 +267,7 @@ function results_display(client) {
             new Chart(ctx3, {
                 type: 'bar',
                 data: {
-                    labels: ['Données brutes', 'Modèle 1', 'Modèle 2', 'Modèle 3', 'Modèle 4', 'Modèle 5', 'Modèle 6'],
+                    labels: ['Données brutes', 'Modèle 1', 'Modèle 2', 'Modèle 3', 'Modèle 4', 'Modèle 5', 'Modèle 6', 'Modèle 7'],
                     datasets: [
                         {
                             label: 'R2',
@@ -284,7 +294,7 @@ function results_display(client) {
             new Chart(ctx4, {
                 type: 'bar',
                 data: {
-                    labels: ['Données brutes', 'Modèle 1', 'Modèle 2', 'Modèle 3', 'Modèle 4', 'Modèle 5', 'Modèle 6'],
+                    labels: ['Données brutes', 'Modèle 1', 'Modèle 2', 'Modèle 3', 'Modèle 4', 'Modèle 5', 'Modèle 6', 'Modèle 7'],
                     datasets: [
                         {
                             label: 'MSE',

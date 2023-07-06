@@ -30,15 +30,15 @@ def import_data(path="../"):
     return df
 
 
-def set_up_index(index):
+def set_up_index(index, offset):
     index.rename({"Date": "horodate"}, axis=1, inplace=True)
     index["horodate"] = pd.to_datetime(index["horodate"])
     index.set_index("horodate", inplace=True)
     index = index.asfreq("D")
     index.reset_index(inplace=True)
     index = index.fillna(method="ffill")
-    date = (index["horodate"] >= pd.to_datetime("2021-01-01")) & (
-        index["horodate"] <= pd.to_datetime("2023-01-31")
+    date = (index["horodate"] >= pd.to_datetime("2021-01-01") - pd.DateOffset(days=offset)) & (
+        index["horodate"] <= pd.to_datetime("2023-01-31") - pd.DateOffset(days=offset)
     )
     index = index[date]
     index.reset_index(inplace=True)
@@ -46,7 +46,7 @@ def set_up_index(index):
     return index
 
 
-def import_data_complete(path="../"):
+def import_data_complete(path="../", offset = 0):
     data = import_data(path)
     CAC = pd.read_csv(path + "data/^FCHI.csv")
     AEX = pd.read_csv(path + "data/^AEX.csv")
@@ -55,12 +55,12 @@ def import_data_complete(path="../"):
     Airliquide = pd.read_csv(path + "data/AI.PA.csv")
     gasNat = pd.read_csv(path + "data/gasNat.csv").rename({"Ouvert": "Open"}, axis=1)
 
-    CAC = set_up_index(CAC)
-    AEX = set_up_index(AEX)
-    BFX = set_up_index(BFX)
-    STOXX = set_up_index(STOXX)
-    Airliquide = set_up_index(Airliquide)
-    gasNat = set_up_index(gasNat)
+    CAC = set_up_index(CAC, offset)
+    AEX = set_up_index(AEX, offset)
+    BFX = set_up_index(BFX, offset)
+    STOXX = set_up_index(STOXX, offset)
+    Airliquide = set_up_index(Airliquide, offset)
+    gasNat = set_up_index(gasNat, offset)
 
     CAC.rename({"Open": "CAC"}, axis=1, inplace=True)
     AEX.rename({"Open": "AEX"}, axis=1, inplace=True)
@@ -69,10 +69,12 @@ def import_data_complete(path="../"):
     Airliquide.rename({"Open": "Airliquide"}, axis=1, inplace=True)
     gasNat.rename({"Open": "gasNat"}, axis=1, inplace=True)
 
-    # CAC.rename({"Volume": "CAC"}, axis = 1, inplace = True)
-    # AEX.rename({"Volume": "AEX"}, axis = 1, inplace = True)
-    # BFX.rename({"Volume": "BFX"}, axis = 1, inplace = True)
-    # STOXX.rename({"Volume": "STOXX"}, axis = 1, inplace = True)
+    CAC["horodate"] = CAC["horodate"] + pd.DateOffset(days=offset)
+    AEX["horodate"] = AEX["horodate"] + pd.DateOffset(days=offset)
+    BFX["horodate"] = BFX["horodate"] + pd.DateOffset(days=offset)
+    STOXX["horodate"] = STOXX["horodate"] + pd.DateOffset(days=offset)
+    Airliquide["horodate"] = Airliquide["horodate"] + pd.DateOffset(days=offset)
+    gasNat["horodate"] = gasNat["horodate"] + pd.DateOffset(days=offset)
 
     # il faut merge avec le tableau principal
     data = pd.merge(data, CAC, on=["horodate"], how="left")

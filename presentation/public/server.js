@@ -72,6 +72,7 @@ app.get('/global-results/:loss', (req, res) => {
             modele4: parseFloat(entry.y4),
             modele5: parseFloat(entry.y5),
             modele6: parseFloat(entry.y6),
+            modele7: parseFloat(entry.y7)
         }));
         res.json(chartData);
     });

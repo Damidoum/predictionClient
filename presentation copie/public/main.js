@@ -14,6 +14,9 @@ function changeClient() {
     } else if (selectedClient == "global-results") {
         let template = generateResultTemplate();
         clientContent.innerHTML = template;
+        global_results_display("mse");
+        global_results_display("mae");
+        global_results_display("r2");
     } else {
         // Afficher les informations du client sélectionné
         //displayData(selectedClient);
@@ -175,5 +178,25 @@ function generateClientTemplate() {
 
 
 function generateResultTemplate() {
-    return ``
+    return `<h1>Synthèse des résultats </h1>
+    <div class="MSE">
+        <h2>Comparaison des MSE</h2>
+        <div class="chart-container">
+            <canvas id="global-mse"></canvas>
+        </div>
+    </div>
+    
+    <div class="MAE">
+        <h2>Comparaison des MSE</h2>
+        <div class="chart-container">
+            <canvas id="global-mae"></canvas>
+        </div>
+    </div>
+    
+    <div class="R2">
+        <h2>Comparaison des R2</h2>
+        <div class="chart-container">
+            <canvas id="global-r2"></canvas>
+        </div>
+    </div>`
 }

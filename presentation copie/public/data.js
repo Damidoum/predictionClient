@@ -29,35 +29,49 @@ function displayData(client) {
     }
 
     for (let i = 0; i < 7; i++) {
-        /*
-        let chart = document.getElementsByClassName("chart")[i];
-        let chartContainer1 = chart.querySelectorAll(".chart-container")[0]
-        let chartContainer2 = chart.querySelectorAll(".chart-container")[1]
 
-        // ajout du zoom in / zoom out
-        chartContainer1.addEventListener('mouseover', function () {
-            this.classList.add('chart-hover');
-        });
-
-        chartContainer1.addEventListener('mouseout', function () {
-            this.classList.remove('chart-hover');
-        });
-
-        chartContainer2.addEventListener('mouseover', function () {
-            this.classList.add('chart-hover');
-        });
-
-        chartContainer2.addEventListener('mouseout', function () {
-            this.classList.remove('chart-hover');
-        });
-
-        let div_title = chartContainer1.querySelectorAll(".chart-title")[0];
-        div_title.textContent = titles[i];
-        */
         if (i == 0) {
             var axis = ["Consommation réelle", "Consommation prédite par le client"];
+            let chart = document.getElementsByClassName("first-chart-container")[i];
+            let chartContainer1 = chart.querySelectorAll(".chart-container")[0]
+
+            // ajout du zoom in / zoom out
+            chartContainer1.addEventListener('mouseover', function () {
+                this.classList.add('chart-hover');
+            });
+
+            chartContainer1.addEventListener('mouseout', function () {
+                this.classList.remove('chart-hover');
+            });
+
+            let div_title = chartContainer1.querySelectorAll(".chart-title")[0];
+            div_title.textContent = titles[i];
             plotChart(client, `plot${i}.csv`, `chart${i}`, axis);
         } else {
+            let chart = document.getElementsByClassName("chart")[i - 1];
+            let chartContainer1 = chart.querySelectorAll(".chart-container")[0]
+            let chartContainer2 = chart.querySelectorAll(".chart-container")[1]
+
+            // ajout du zoom in / zoom out
+            chartContainer1.addEventListener('mouseover', function () {
+                this.classList.add('chart-hover');
+            });
+
+            chartContainer1.addEventListener('mouseout', function () {
+                this.classList.remove('chart-hover');
+            });
+
+            chartContainer2.addEventListener('mouseover', function () {
+                this.classList.add('chart-hover');
+            });
+
+            chartContainer2.addEventListener('mouseout', function () {
+                this.classList.remove('chart-hover');
+            });
+
+            let div_title = chartContainer1.querySelectorAll(".chart-title")[0];
+            div_title.textContent = titles[i];
+
             var axis = ["Valeur réelle", "Prédiction du modèle"];
             plotChart(client, `plot${i}.csv`, `chart${i}`, axis);
             plotChart_scatter(client, `plot${i}.csv`, `scatter${i}`, axis);
@@ -65,6 +79,102 @@ function displayData(client) {
         }
     }
     results_display(client);
+}
+
+function global_results_display(loss) {
+    fetch(`/global-results/${loss}.csv`)
+        .then(response => response.json())
+        .then(data => {
+            const clients = data.map(entry => entry.clients);
+            const modele0 = data.map(entry => entry.modele0);
+            const modele1 = data.map(entry => entry.modele1);
+            const modele2 = data.map(entry => entry.modele2);
+            const modele3 = data.map(entry => entry.modele3);
+            const modele4 = data.map(entry => entry.modele4);
+            const modele5 = data.map(entry => entry.modele5);
+            const modele6 = data.map(entry => entry.modele6);
+
+            const ctx = document.getElementById(`global-${loss}`).getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: clients,
+                    datasets: [
+                        {
+                            label: "Données Brutes",
+                            data: modele0,
+                            borderColor: 'red',
+                            backgroundColor: 'transparent',
+                            fill: false
+                        },
+                        {
+                            label: "Modèle 1",
+                            data: modele1,
+                            borderColor: 'blue',
+                            backgroundColor: 'transparent',
+                            fill: false
+                        },
+                        {
+                            label: "Modèle 2",
+                            data: modele2,
+                            borderColor: 'green',
+                            backgroundColor: 'transparent',
+                            fill: false
+                        },
+                        {
+                            label: "Modèle 3",
+                            data: modele3,
+                            borderColor: 'orange',
+                            backgroundColor: 'transparent',
+                            fill: false
+                        },
+                        {
+                            label: "Modèle 4",
+                            data: modele4,
+                            borderColor: 'purple',
+                            backgroundColor: 'transparent',
+                            fill: false
+                        },
+                        {
+                            label: "Modèle 5",
+                            data: modele5,
+                            borderColor: 'pink',
+                            backgroundColor: 'transparent',
+                            fill: false
+                        },
+                        {
+                            label: "Modèle 6",
+                            data: modele6,
+                            borderColor: 'gray',
+                            backgroundColor: 'transparent',
+                            fill: false
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        x: {
+                            type: 'category',
+                            beginAtZero: true,
+                            grid: {
+                                display: false
+                            },
+                            ticks: {
+                                callback: function (value, index, values) {
+                                    // Gérer l'interaction avec l'axe des abscisses ici
+                                    // Rétracer le graphique en fonction de la valeur sélectionnée
+                                }
+                            }
+                        },
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+
+        });
 }
 
 function results_display(client) {
