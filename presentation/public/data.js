@@ -36,7 +36,7 @@ function displayData(client) {
             var axis = ["Consommation réelle", "Consommation prédite par le client"];
             let chart = document.getElementsByClassName("first-chart-container")[i];
             let chartContainer1 = chart.querySelectorAll(".chart-container")[0]
-
+            /*
             // ajout du zoom in / zoom out
             chartContainer1.addEventListener('mouseover', function () {
                 this.classList.add('chart-hover');
@@ -45,6 +45,7 @@ function displayData(client) {
             chartContainer1.addEventListener('mouseout', function () {
                 this.classList.remove('chart-hover');
             });
+            */
 
             let div_title = chartContainer1.querySelectorAll(".chart-title")[0];
             div_title.textContent = titles[i];
@@ -53,7 +54,7 @@ function displayData(client) {
             let chart = document.getElementsByClassName("chart")[i - 1];
             let chartContainer1 = chart.querySelectorAll(".chart-container")[0]
             let chartContainer2 = chart.querySelectorAll(".chart-container")[1]
-
+            /*
             // ajout du zoom in / zoom out
             chartContainer1.addEventListener('mouseover', function () {
                 this.classList.add('chart-hover');
@@ -70,6 +71,7 @@ function displayData(client) {
             chartContainer2.addEventListener('mouseout', function () {
                 this.classList.remove('chart-hover');
             });
+            */
 
             let div_title = chartContainer1.querySelectorAll(".chart-title")[0];
             div_title.textContent = titles[i];
